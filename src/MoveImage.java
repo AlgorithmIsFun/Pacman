@@ -4,12 +4,13 @@ import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
-public class MoveImage extends JFrame implements KeyListener, MouseListener {
+public class MoveImage extends JPanel implements KeyListener, MouseListener {
 
-    private ImageIcon imageIcon, backgroundImage, whitedot;
+    private ImageIcon imageIcon, backgroundImage, whitedot, ghost;
     private int x, y;
-    private int direction; //1=up, 0=right, -1=down, 2=left
-    private int MAXL = 500;
+    private int ghostx, ghosty;
+    private int direction, ghostdirection; //1=up, 0=right, -1=down, 2=left
+    private static int MAXL = 500;
     
     private int[][] dots = {
     		// 6 rows
@@ -39,10 +40,6 @@ public class MoveImage extends JFrame implements KeyListener, MouseListener {
     //10
     private static int delay = 10;
     public MoveImage() {
-        setTitle("Move Image with Arrow Keys");
-        setSize(MAXL, MAXL);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
 
         imageIcon = new ImageIcon("C:\\Users\\abdul\\eclipse-workspace\\MoveImage\\download.png"); // Replace with your image path
         Image newimg = imageIcon.getImage().getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH);
@@ -53,6 +50,11 @@ public class MoveImage extends JFrame implements KeyListener, MouseListener {
         whitedot = new ImageIcon("C:\\Users\\abdul\\eclipse-workspace\\MoveImage\\whitedot.png");
         newimg = whitedot.getImage().getScaledInstance(5, 5, java.awt.Image.SCALE_SMOOTH);
         whitedot = new ImageIcon(newimg);
+        ghost = new ImageIcon("C:\\Users\\abdul\\eclipse-workspace\\MoveImage\\ghost.png");
+        newimg = ghost.getImage().getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH);
+        ghost = new ImageIcon(newimg);
+        ghostx = 250;
+        ghosty = 190;
         x = 240;
         y = 370;
         addKeyListener(this);
@@ -66,60 +68,101 @@ public class MoveImage extends JFrame implements KeyListener, MouseListener {
     	}
     	x = 240;
         y = 370;
+        ghostx = 250;
+        ghosty = 190;
     }
     //Wall: 300, 300		350, 350
-    public void barrier( int change) {
-    	if (x < 25) x = 25;
-    	if (y < 42) y = 42;
-    	if (x > MAXL-40) x = MAXL-40;
-    	if (y > MAXL-40) y = MAXL-40;
-    	
+    public void barrier( int change, int ghost_bot) {
+    	boolean hit = false;
+    	if (ghost_bot == 0) {
+	    	if (x < 25) {
+	    		x = 25;
+	    		hit = true;
+	    	}
+	    	if (y < 42) {
+	    		y = 42;
+	    		hit = true;
+	    	}
+	    	if (x > MAXL-40) {
+	    		x = MAXL-40;
+	    		hit = true;
+	    	}
+	    	if (y > MAXL-40) {
+	    		y = MAXL-40;
+	    		hit = true;
+	    	}
+    	} else {
+    		if (ghostx < 25) {
+    			ghostx = 25;
+	    		hit = true;
+	    	}
+	    	if (ghosty < 42) {
+	    		ghosty = 42;
+	    		hit = true;
+	    	}
+	    	if (ghostx > MAXL-40) {
+	    		ghostx = MAXL-40;
+	    		hit = true;
+	    	}
+	    	if (ghosty > MAXL-40) {
+	    		ghosty = MAXL-40;
+	    		hit = true;
+	    	}
+    	}
     	
     	//Level 1
-    	wall(change, 33, 47, 110, 102);
-    	wall(change, 118, 47, 212, 102);
-    	wall(change, 222, 40, 264, 102);
-    	wall(change, 273, 47, 367, 102);
-    	wall(change, 375, 47, 453, 102);
+    	hit = hit || wall(change, 33, 47, 110, 102, ghost_bot);
+    	hit = hit || wall(change, 118, 47, 212, 102, ghost_bot);
+    	hit = hit || wall(change, 222, 40, 264, 102, ghost_bot);
+    	hit = hit || wall(change, 273, 47, 367, 102, ghost_bot);
+    	hit = hit || wall(change, 375, 47, 453, 102, ghost_bot);
     	//Level 2
-    	wall(change, 33, 106, 110, 146);
-    	wall(change, 117, 106, 161, 235);
-    	wall(change, 170, 106, 315, 146);
-    	wall(change, 325, 106, 367, 235);
-    	wall(change, 375, 106, 453, 146);
+    	hit = hit || wall(change, 33, 106, 110, 146, ghost_bot);
+    	hit = hit || wall(change, 117, 106, 161, 235, ghost_bot);
+    	hit = hit || wall(change, 170, 106, 315, 146, ghost_bot);
+    	hit = hit || wall(change, 325, 106, 367, 235, ghost_bot);
+    	hit = hit || wall(change, 375, 106, 453, 146, ghost_bot);
     	//Level 3
-    	wall(change, 25, 150, 110, 325);
-    	wall(change, 120, 150, 210, 190);
-    	wall(change, 220, 130, 265, 190);
-    	wall(change, 272, 150, 340, 190);
-    	wall(change, 375, 150, 487, 325);
+    	hit = hit || wall(change, 25, 150, 110, 325, ghost_bot);
+    	hit = hit || wall(change, 120, 150, 210, 190, ghost_bot);
+    	hit = hit || wall(change, 220, 130, 265, 190, ghost_bot);
+    	hit = hit || wall(change, 272, 150, 340, 190, ghost_bot);
+    	hit = hit || wall(change, 375, 150, 487, 325, ghost_bot);
     	//Middle
-    	wall(change, 170, 196, 315, 280);
+    	hit = hit || wall(change, 170, 196, 315, 280, ghost_bot);
     	//Level 4
-    	wall(change, 120, 240, 160, 325);
-    	wall(change, 170, 285, 315, 325);
-    	wall(change, 325, 240, 367, 325);
+    	hit = hit || wall(change, 120, 240, 160, 325, ghost_bot);
+    	hit = hit || wall(change, 170, 285, 315, 325, ghost_bot);
+    	hit = hit || wall(change, 325, 240, 367, 325, ghost_bot);
     	//Level 5
-    	wall(change, 33, 330, 110, 370);
-    	wall(change, 118, 330, 212, 370);
-    	wall(change, 222, 308, 265, 370);
-    	wall(change, 272, 330, 367, 370);
-    	wall(change, 375, 330, 453, 370);
+    	hit = hit || wall(change, 33, 330, 110, 370, ghost_bot);
+    	hit = hit || wall(change, 118, 330, 212, 370, ghost_bot);
+    	hit = hit || wall(change, 222, 308, 265, 370, ghost_bot);
+    	hit = hit || wall(change, 272, 330, 367, 370, ghost_bot);
+    	hit = hit || wall(change, 375, 330, 453, 370, ghost_bot);
     	//Level 6
-    	wall(change, 25, 373, 60, 413);
-    	wall(change, 67, 352, 110, 413);
-    	wall(change, 118, 375, 161, 435);
-    	wall(change, 171, 375, 315, 413);
-    	wall(change, 325, 375, 368, 435);
-    	wall(change, 375, 352, 418, 413);
-    	wall(change, 427, 373, 480, 413);
+    	hit = hit || wall(change, 25, 373, 60, 413, ghost_bot);
+    	hit = hit || wall(change, 67, 352, 110, 413, ghost_bot);
+    	hit = hit || wall(change, 118, 375, 161, 435, ghost_bot);
+    	hit = hit || wall(change, 171, 375, 315, 413, ghost_bot);
+    	hit = hit || wall(change, 325, 375, 368, 435, ghost_bot);
+    	hit = hit || wall(change, 375, 352, 418, 413, ghost_bot);
+    	hit = hit || wall(change, 427, 373, 480, 413, ghost_bot);
     	//Level 7
-    	wall(change, 32, 419, 211, 457);
-    	wall(change, 222, 396, 264, 457);
-    	wall(change, 273, 419, 455, 457);
-    	for (int i = 0; i < ndots; i++) {
-    		check_dot(i);
+    	hit = hit || wall(change, 32, 419, 211, 457, ghost_bot);
+    	hit = hit || wall(change, 222, 396, 264, 457, ghost_bot);
+    	hit = hit || wall(change, 273, 419, 455, 457, ghost_bot);
+    	if (ghost_bot == 1 && hit) {
+    		System.out.println("Ghost has hit wall");
+    		 int randomNumber = (int)(Math.random() * 4) + 1;
+    		 ghostdirection = randomNumber - 2;
+    		 
     	}
+    	if (ghost_bot == 0) {
+    		for (int i = 0; i < ndots; i++) {
+        		check_dot(i);
+        	}
+    	}	
     }
     public void check_dot(int dotnum) {
     	if (intersect(x, y, 15, 15, dots[dotnum][0], dots[dotnum][1], 5, 5)) {
@@ -134,18 +177,53 @@ public class MoveImage extends JFrame implements KeyListener, MouseListener {
 
         return checkX && checkY;
     }
-    public void wall(int change, int sposx, int sposy, int fposx, int fposy) {
-    	if (x > sposx && x < fposx && y > sposy & y < fposy) {
-    		if (change == 2) {
-    			x += movementspeed;
-    		} else if (change == 1){
-    			y += movementspeed;
-    		} else if (change == 0){
-    			x -= movementspeed;
-    		} else if (change == -1){
-    			y -= movementspeed;
-    		}
-       	}
+    public boolean wall(int change, int sposx, int sposy, int fposx, int fposy, int ghost_bot) {
+    	if (ghost_bot == 0) {
+    		if (x > sposx && x < fposx && y > sposy & y < fposy) {
+        		if (change == 2) {
+        			x += movementspeed;
+        		} else if (change == 1){
+        			y += movementspeed;
+        		} else if (change == 0){
+        			x -= movementspeed;
+        		} else if (change == -1){
+        			y -= movementspeed;
+        		}
+        		return true;
+           	}
+        	return false;
+    	} else {
+	    	if (ghostx > sposx && ghostx < fposx && ghosty > sposy & ghosty < fposy) {
+	    		if (change == 2) {
+	    			ghostx += movementspeed;
+	    		} else if (change == 1){
+	    			ghosty += movementspeed;
+	    		} else if (change == 0){
+	    			ghostx -= movementspeed;
+	    		} else if (change == -1){
+	    			ghosty -= movementspeed;
+	    		}
+	    		return true;
+	       	}
+	    	return false;
+    	}
+    }
+    public void move_ghost() {
+    	//System.out.println("Pacman before pos: " + x + " " + y);
+    	if (ghostdirection == 2) {
+    		ghostx -= movementspeed;
+    	} else if (ghostdirection == 1) {
+    		ghosty -= movementspeed;
+    	} else if (ghostdirection == 0) {
+    		ghostx += movementspeed;
+    	} else if (ghostdirection == -1) {
+    		ghosty += movementspeed;
+    	}
+    	barrier(ghostdirection, 1);
+    	if (intersect(ghostx, ghosty, 15, 15, x, y, 15, 15)) {
+    		reset();
+    	}
+    	repaint();
     }
     public void move_image() {
     	//System.out.println("Pacman before pos: " + x + " " + y);
@@ -158,7 +236,8 @@ public class MoveImage extends JFrame implements KeyListener, MouseListener {
     	} else if (direction == -1) {
     		y += movementspeed;
     	}
-    	barrier(direction);
+    	barrier(direction, 0);
+    	move_ghost();
     	
     	repaint();
     }
@@ -177,6 +256,7 @@ public class MoveImage extends JFrame implements KeyListener, MouseListener {
         	reset();
         }
         g.drawImage(imageIcon.getImage(), x, y, this);
+        g.drawImage(ghost.getImage(), ghostx, ghosty, this);
     }
 
     @Override
@@ -262,7 +342,12 @@ public class MoveImage extends JFrame implements KeyListener, MouseListener {
     
 
     public static void main(String[] args) throws InterruptedException {
+    	JFrame frame = new JFrame("Move Image with Arrow Keys");
     	MoveImage image = new MoveImage();
+    	frame.add(image);
+    	frame.setSize(MAXL+10, MAXL+30);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
         SwingUtilities.invokeLater(() -> image.setVisible(true));
         while(true) {
         	Thread.sleep(delay);
