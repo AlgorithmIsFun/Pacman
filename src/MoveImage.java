@@ -129,6 +129,7 @@ public class MoveImage extends JPanel implements KeyListener, MouseListener {
     	hit = hit || wall(change, 272, 150, 340, 190, ghost_bot);
     	hit = hit || wall(change, 375, 150, 487, 325, ghost_bot);
     	//Middle
+    	hit = hit || wall(change, 12, 150, 110, 325, ghost_bot);
     	hit = hit || wall(change, 170, 196, 315, 280, ghost_bot);
     	//Level 4
     	hit = hit || wall(change, 120, 240, 160, 325, ghost_bot);
@@ -141,7 +142,7 @@ public class MoveImage extends JPanel implements KeyListener, MouseListener {
     	hit = hit || wall(change, 272, 330, 367, 370, ghost_bot);
     	hit = hit || wall(change, 375, 330, 453, 370, ghost_bot);
     	//Level 6
-    	hit = hit || wall(change, 25, 373, 60, 413, ghost_bot);
+    	hit = hit || wall(change, 12, 373, 60, 413, ghost_bot);
     	hit = hit || wall(change, 67, 352, 110, 413, ghost_bot);
     	hit = hit || wall(change, 118, 375, 161, 435, ghost_bot);
     	hit = hit || wall(change, 171, 375, 315, 413, ghost_bot);
