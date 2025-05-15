@@ -3,6 +3,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import javax.sound.sampled.*;
+import java.io.File;
 
 public class MoveImage extends JPanel implements KeyListener, MouseListener {
 
@@ -11,7 +13,7 @@ public class MoveImage extends JPanel implements KeyListener, MouseListener {
     private int ghostx, ghosty;
     private int direction, ghostdirection; //1=up, 0=right, -1=down, 2=left
     private static int MAXL = 500;
-    
+    private static Clip loopclip;
     private int[][] dots = {
     		// 6 rows
     		{33, 50, 1}, {53, 50, 1}, {73, 50, 1}, {93, 50, 1}, {113, 50, 1}, {133, 50, 1}, {153, 50, 1}, {173, 50, 1}, {193, 50, 1}, {213, 50, 1}, {273, 50, 1}, {293, 50, 1}, {313, 50, 1}, {333, 50, 1}, {353, 50, 1}, {373, 50, 1}, {393, 50, 1}, {413, 50, 1}, {433, 50, 1}, {453, 50, 1}, {465, 50, 1},
@@ -70,6 +72,20 @@ public class MoveImage extends JPanel implements KeyListener, MouseListener {
         y = 370;
         ghostx = 250;
         ghosty = 190;
+        try {
+        	loopclip.stop();
+	        File audioFile = new File("C:\\Users\\abdul\\eclipse-workspace\\MoveImage\\pacman_death.wav"); // Replace with your sound file
+	        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioFile);
+	        Clip clip = AudioSystem.getClip();
+	        clip.open(audioInputStream);
+	        clip.start();
+	        Thread.sleep(2000);
+	        loopclip.loop(Clip.LOOP_CONTINUOUSLY);
+	        loopclip.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
     }
     //Wall: 300, 300		350, 350
     public void barrier( int change, int ghost_bot) {
@@ -350,6 +366,26 @@ public class MoveImage extends JPanel implements KeyListener, MouseListener {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
         SwingUtilities.invokeLater(() -> image.setVisible(true));
+        try {
+	        File audioFile = new File("C:\\Users\\abdul\\eclipse-workspace\\MoveImage\\pacman_beginning.wav"); // Replace with your sound file
+	        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioFile);
+	        Clip clip = AudioSystem.getClip();
+	        clip.open(audioInputStream);
+	        clip.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Thread.sleep(5000);
+        try {
+	        File audioFile = new File("C:\\Users\\abdul\\eclipse-workspace\\MoveImage\\pacman_chomp.wav"); // Replace with your sound file
+	        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioFile);
+	        loopclip = AudioSystem.getClip();
+	        loopclip.open(audioInputStream);
+	        loopclip.loop(Clip.LOOP_CONTINUOUSLY);
+	        loopclip.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         while(true) {
         	Thread.sleep(delay);
         	image.move_image();
