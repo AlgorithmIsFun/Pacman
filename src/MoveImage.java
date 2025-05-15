@@ -8,10 +8,11 @@ import java.io.File;
 
 public class MoveImage extends JPanel implements KeyListener, MouseListener {
 
-    private ImageIcon imageIcon, backgroundImage, whitedot, ghost;
+    private ImageIcon imageIcon, backgroundImage, whitedot, ghost, ghost2, ghost3, ghost4;
     private int x, y;
-    private int ghostx, ghosty;
-    private int direction, ghostdirection; //1=up, 0=right, -1=down, 2=left
+    private int[][] ghostpos = new int[4][2];
+    private int direction; //1=up, 0=right, -1=down, 2=left
+    private int[] ghostdirection = new int[4];
     private static int MAXL = 500;
     private static Clip loopclip;
     private int[][] dots = {
@@ -55,8 +56,27 @@ public class MoveImage extends JPanel implements KeyListener, MouseListener {
         ghost = new ImageIcon("C:\\Users\\abdul\\eclipse-workspace\\MoveImage\\ghost.png");
         newimg = ghost.getImage().getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH);
         ghost = new ImageIcon(newimg);
-        ghostx = 250;
-        ghosty = 190;
+        ghost2 = new ImageIcon("C:\\Users\\abdul\\eclipse-workspace\\MoveImage\\ghost.png");
+        newimg = ghost2.getImage().getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH);
+        ghost2 = new ImageIcon(newimg);
+        ghost3 = new ImageIcon("C:\\Users\\abdul\\eclipse-workspace\\MoveImage\\ghost.png");
+        newimg = ghost3.getImage().getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH);
+        ghost3 = new ImageIcon(newimg);
+        ghost4 = new ImageIcon("C:\\Users\\abdul\\eclipse-workspace\\MoveImage\\ghost.png");
+        newimg = ghost4.getImage().getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH);
+        ghost4 = new ImageIcon(newimg);
+        ghostpos[0][0] = 250;
+        ghostpos[0][1] = 190;
+        ghostpos[1][0] = 250;
+        ghostpos[1][1] = 190;
+        ghostpos[2][0] = 250;
+        ghostpos[2][1] = 190;
+        ghostpos[3][0] = 250;
+        ghostpos[3][1] = 190;
+        ghostdirection[0] = 2;
+        ghostdirection[1] = 2;
+        ghostdirection[2] = 2;
+        ghostdirection[3] = 2;
         x = 240;
         y = 370;
         addKeyListener(this);
@@ -70,8 +90,18 @@ public class MoveImage extends JPanel implements KeyListener, MouseListener {
     	}
     	x = 240;
         y = 370;
-        ghostx = 250;
-        ghosty = 190;
+        ghostpos[0][0] = 250;
+        ghostpos[0][1] = 190;
+        ghostpos[1][0] = 250;
+        ghostpos[1][1] = 190;
+        ghostpos[2][0] = 250;
+        ghostpos[2][1] = 190;
+        ghostpos[3][0] = 250;
+        ghostpos[3][1] = 190;
+        ghostdirection[0] = 2;
+        ghostdirection[1] = 2;
+        ghostdirection[2] = 2;
+        ghostdirection[3] = 2;
         try {
         	loopclip.stop();
 	        File audioFile = new File("C:\\Users\\abdul\\eclipse-workspace\\MoveImage\\pacman_death.wav"); // Replace with your sound file
@@ -108,20 +138,20 @@ public class MoveImage extends JPanel implements KeyListener, MouseListener {
 	    		hit = true;
 	    	}
     	} else {
-    		if (ghostx < 25) {
-    			ghostx = 25;
+    		if (ghostpos[ghost_bot-1][0] < 25) {
+    			ghostpos[ghost_bot-1][0] = 25;
 	    		hit = true;
 	    	}
-	    	if (ghosty < 42) {
-	    		ghosty = 42;
+	    	if (ghostpos[ghost_bot-1][1] < 42) {
+	    		ghostpos[ghost_bot-1][1] = 42;
 	    		hit = true;
 	    	}
-	    	if (ghostx > MAXL-40) {
-	    		ghostx = MAXL-40;
+	    	if (ghostpos[ghost_bot-1][0] > MAXL-40) {
+	    		ghostpos[ghost_bot-1][0] = MAXL-40;
 	    		hit = true;
 	    	}
-	    	if (ghosty > MAXL-40) {
-	    		ghosty = MAXL-40;
+	    	if (ghostpos[ghost_bot-1][1] > MAXL-40) {
+	    		ghostpos[ghost_bot-1][1] = MAXL-40;
 	    		hit = true;
 	    	}
     	}
@@ -169,10 +199,10 @@ public class MoveImage extends JPanel implements KeyListener, MouseListener {
     	hit = hit || wall(change, 32, 419, 211, 457, ghost_bot);
     	hit = hit || wall(change, 222, 396, 264, 457, ghost_bot);
     	hit = hit || wall(change, 273, 419, 455, 457, ghost_bot);
-    	if (ghost_bot == 1 && hit) {
+    	if (ghost_bot > 0 && hit) {
     		System.out.println("Ghost has hit wall");
     		 int randomNumber = (int)(Math.random() * 4) + 1;
-    		 ghostdirection = randomNumber - 2;
+    		 ghostdirection[ghost_bot-1] = randomNumber - 2;
     		 
     	}
     	if (ghost_bot == 0) {
@@ -210,15 +240,15 @@ public class MoveImage extends JPanel implements KeyListener, MouseListener {
            	}
         	return false;
     	} else {
-	    	if (ghostx > sposx && ghostx < fposx && ghosty > sposy & ghosty < fposy) {
+	    	if (ghostpos[ghost_bot-1][0] > sposx && ghostpos[ghost_bot-1][0] < fposx && ghostpos[ghost_bot-1][1] > sposy & ghostpos[ghost_bot-1][1] < fposy) {
 	    		if (change == 2) {
-	    			ghostx += movementspeed;
+	    			ghostpos[ghost_bot-1][0] += movementspeed;
 	    		} else if (change == 1){
-	    			ghosty += movementspeed;
+	    			ghostpos[ghost_bot-1][1] += movementspeed;
 	    		} else if (change == 0){
-	    			ghostx -= movementspeed;
+	    			ghostpos[ghost_bot-1][0] -= movementspeed;
 	    		} else if (change == -1){
-	    			ghosty -= movementspeed;
+	    			ghostpos[ghost_bot-1][1] -= movementspeed;
 	    		}
 	    		return true;
 	       	}
@@ -227,18 +257,20 @@ public class MoveImage extends JPanel implements KeyListener, MouseListener {
     }
     public void move_ghost() {
     	//System.out.println("Pacman before pos: " + x + " " + y);
-    	if (ghostdirection == 2) {
-    		ghostx -= movementspeed;
-    	} else if (ghostdirection == 1) {
-    		ghosty -= movementspeed;
-    	} else if (ghostdirection == 0) {
-    		ghostx += movementspeed;
-    	} else if (ghostdirection == -1) {
-    		ghosty += movementspeed;
-    	}
-    	barrier(ghostdirection, 1);
-    	if (intersect(ghostx, ghosty, 15, 15, x, y, 15, 15)) {
-    		reset();
+    	for (int i = 0; i < 4; i++) {
+	    	if (ghostdirection[i] == 2) {
+	    		ghostpos[i][0] -= movementspeed;
+	    	} else if (ghostdirection[i] == 1) {
+	    		ghostpos[i][1] -= movementspeed;
+	    	} else if (ghostdirection[i] == 0) {
+	    		ghostpos[i][0] += movementspeed;
+	    	} else if (ghostdirection[i] == -1) {
+	    		ghostpos[i][1] += movementspeed;
+	    	}
+	    	barrier(ghostdirection[i], i+1);
+	    	if (intersect(ghostpos[i][0], ghostpos[i][1], 15, 15, x, y, 15, 15)) {
+	    		reset();
+	    	}
     	}
     	repaint();
     }
@@ -273,7 +305,10 @@ public class MoveImage extends JPanel implements KeyListener, MouseListener {
         	reset();
         }
         g.drawImage(imageIcon.getImage(), x, y, this);
-        g.drawImage(ghost.getImage(), ghostx, ghosty, this);
+        g.drawImage(ghost.getImage(), ghostpos[0][0], ghostpos[0][1], this);
+        g.drawImage(ghost2.getImage(), ghostpos[1][0], ghostpos[1][1], this);
+        g.drawImage(ghost3.getImage(), ghostpos[2][0], ghostpos[2][1], this);
+        g.drawImage(ghost4.getImage(), ghostpos[3][0], ghostpos[3][1], this);
     }
 
     @Override
